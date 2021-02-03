@@ -125,7 +125,10 @@ def visualize_detector_output(detector_output_path: str,
         #identify category for later sorting -mk
         
         try:
-          category = entry['detections'][0]['category']
+          if entry['max_detection_conf'] >= confidence:
+            category = entry['detections'][0]['category']
+          else:
+            category = '0'
         except:
           category = '0'
 

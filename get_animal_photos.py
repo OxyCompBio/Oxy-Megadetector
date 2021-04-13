@@ -1,3 +1,10 @@
+"""
+Get animal photos: this file takes two arguments, path to detector output .json file and desired output location for photos with animal detections to be copied.
+Creates a folder titled 'animal' + the date and time this program was executed.
+Created by Miles Koupal.
+"""
+
+
 import json
 import argparse
 import os

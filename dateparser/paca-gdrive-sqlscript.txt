@@ -1,0 +1,37 @@
+create table `paca-gdrivetimestamp`
+select *
+from `gdrivetimestamp` as gt
+left join `paca` as p
+on p.photoDateTime = gt.exifTimestamp and gt.photoDir like concat("%",substring(p.locationAbbr,5),"%")
+
+UNION
+
+select *
+from `gdrivetimestamp` as gt
+right join `paca` as p
+on p.photoDateTime = gt.exifTimestamp and gt.photoDir like concat("%",substring(p.locationAbbr,5),"%");
+
+
+
+CREATE TABLE `paca-gdrive`
+select ct.photoDir, GROUP_CONCAT(DISTINCT ct.isEmpty separator ";") AS isEmpty, GROUP_CONCAT(DISTINCT ct.hasExif separator ";") AS hasExif,
+					GROUP_CONCAT(DISTINCT ct.successfulOCR separator ";") AS successfulOCR, GROUP_CONCAT(DISTINCT ct.ocrTimestamp separator ";") AS ocrTimestamp,
+                    GROUP_CONCAT(DISTINCT ct.exifTimestamp separator ";") AS exifTimestamp, GROUP_CONCAT(DISTINCT lastModTimestamp separator ";") AS lastModTimestamp,
+                    GROUP_CONCAT(DISTINCT ct.photoDateTime separator ";") AS photoDateTime, GROUP_CONCAT(DISTINCT ct.locationAbbr separator ";") AS locationAbbr,
+                    GROUP_CONCAT(DISTINCT ct.photoName separator ";") AS photoName, GROUP_CONCAT(ct.commonName separator ";") AS commonName,
+                    GROUP_CONCAT(ct.numIndividuals separator ";") AS numIndividuals
+FROM `paca-gdrivetimestamp` ct
+where ct.photoDir is not null
+GROUP BY ct.photoDir
+
+union
+
+select GROUP_CONCAT(DISTINCT ct.photoDir separator ";") AS photoDir, GROUP_CONCAT(DISTINCT ct.isEmpty separator ";") AS isEmpty, GROUP_CONCAT(DISTINCT ct.hasExif separator ";") AS hasExif,
+					GROUP_CONCAT(DISTINCT ct.successfulOCR separator ";") AS successfulOCR, GROUP_CONCAT(DISTINCT ct.ocrTimestamp separator ";") AS ocrTimestamp,
+                    GROUP_CONCAT(DISTINCT ct.exifTimestamp separator ";") AS exifTimestamp, GROUP_CONCAT(DISTINCT lastModTimestamp separator ";") AS lastModTimestamp,
+                    GROUP_CONCAT(DISTINCT ct.photoDateTime separator ";") AS photoDateTime, GROUP_CONCAT(DISTINCT ct.locationAbbr separator ";") AS locationAbbr,
+                    ct.photoName, GROUP_CONCAT(ct.commonName separator ";") AS commonName,
+                    GROUP_CONCAT(ct.numIndividuals separator ";") AS numIndividuals
+FROM `paca-gdrivetimestamp` ct
+where ct.photoDir is null
+GROUP BY ct.photoName;

@@ -1,3 +1,6 @@
+-- import gdrivetimestamp.zip as gdrivetimestamp
+-- import paca_timestamp.zip as paca
+
 create table `paca-gdrivetimestamp`
 select *
 from `gdrivetimestamp` as gt

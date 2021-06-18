@@ -1,3 +1,8 @@
+'''
+This file populates a CSV file of images with detection categories and confidences from a megadetector output
+It takes three arguments, path to json output, path to CSV file and desired output path for copy of your CSV file
+'''
+
 from csv import reader
 from csv import writer
 import json

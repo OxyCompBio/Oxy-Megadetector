@@ -27,15 +27,18 @@ def copy_files(detector_output_dir, images_output):
 
     for i in filenames:
       detector_output = os.path.join(detector_output_dir, i)
-      if datetime.now() - datetime.fromtimestamp(os.stat(detector_output).st_ctime) < timedelta(0, 0, 0, 0, 0, 1):
+      print(f'Processing folder: {detector_output}')
+      if True:
+      # if datetime.now() - datetime.fromtimestamp(os.stat(detector_output).st_ctime) < timedelta(0, 0, 0, 0, 0, 1):
         files = []
+        num_files = 0
 
         with open (detector_output) as f:
           images = json.load(f)
           
         for entry in images['images']:
           imgPath = i.split('.')[0] + '/' + entry['file']
-          print(entry['file'])
+          num_files += 1
 
           # add first and last image from folder
           if entry['file'] == images['images'][0]['file'] or entry['file'] == images['images'][-1]['file']:
@@ -49,7 +52,9 @@ def copy_files(detector_output_dir, images_output):
               files.append(imgPath)
               continue
         
-        
+        num_matches = len(files)
+        print(f'Folder contains {num_matches}/{num_files} images matching above threadhold.')
+
         for image_file in files:
           source = os.path.join(BASE_PATH, image_file)
           destination = os.path.join(images_output, image_file)
@@ -58,6 +63,7 @@ def copy_files(detector_output_dir, images_output):
             os.makedirs(os.path.dirname(os.path.join(images_output, image_file)))
       
           shutil.copy(source, destination)
-
+      else:
+        print(f'Skipping folder due to recent modification: {detector_output}')
 if __name__ == "__main__":
   copy_files(args.file_location,args.output_dest)

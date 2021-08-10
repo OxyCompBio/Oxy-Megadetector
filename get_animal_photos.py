@@ -50,7 +50,7 @@ def copy_files(detector_output_dir, images_output):
 
             if detection['category'] == '1' and entry['max_detection_conf'] > 0.8:
               files.append(imgPath)
-              continue
+              break
         
         num_matches = len(files)
         print(f'Folder contains {num_matches}/{num_files} images matching above threadhold.')

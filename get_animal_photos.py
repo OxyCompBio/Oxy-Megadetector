@@ -45,7 +45,7 @@ def copy_files(detector_output_dir, images_output):
             print("first/last")
             files.append(imgPath)
             continue
-
+	
           if ('detections' in entry):
             for detection in entry['detections']:
 

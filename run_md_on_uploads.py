@@ -32,10 +32,10 @@ def main(PHOTO_UPLOAD, md_output_dest):
                 print("Old Folder!")
                 continue
             print("New Folder!")
-            detector_file = "md_v4.1.0.pb"
+            detector_file = "/home/compbio/megadetector/md_v4.1.0.pb"
             output_file = os.path.join(md_output_dest, i + ".json")
             current_photo_folder = os.path.join(PHOTO_UPLOAD, i)
-            subprocess.call(["python", "run_tf_detector_batch.py", detector_file, current_photo_folder, output_file, "--recursive", "--output_relative_filenames"])
+            subprocess.call(["python", "/home/compbio/megadetector/CameraTraps/detection/run_tf_detector_batch.py", detector_file, current_photo_folder, output_file, "--recursive", "--output_relative_filenames"])
         
 
 if __name__ == "__main__":

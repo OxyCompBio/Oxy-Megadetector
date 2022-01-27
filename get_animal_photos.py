@@ -62,7 +62,11 @@ def copy_files(detector_output_dir, images_output):
           if not os.path.isdir(os.path.dirname(os.path.join(images_output, image_file))):
             os.makedirs(os.path.dirname(os.path.join(images_output, image_file)))
       
-          shutil.copy(source, destination)
+          try:
+            shutil.copy(source, destination)
+          except FileNotFoundError:
+            print("Skipping missing file")
+            
       else:
         print(f'Skipping folder due to recent modification: {detector_output}')
 if __name__ == "__main__":

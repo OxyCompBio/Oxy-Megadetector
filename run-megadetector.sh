@@ -1,5 +1,5 @@
 # must be run on a GPU environment (ssh01)
-ssh gpu01
+cd Oxy-Megadetector
 
 conda activate tensorflow
 

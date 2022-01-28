@@ -14,42 +14,40 @@ Tech we use:
 - https://beerys.github.io/CaltechCameraTraps/
 - https://beerys.github.io (see links at bottom)
 
-#### Running The Megadetector Pipeline ####
+## Using The Megadetector Pipeline ####
 
-To prepare:
+### Preparing the pipeline
 
 Create shared google drive folders:
-	- `Photo_Uploads` - A place to upload photos to
-	- `Photo_MegaOutput` - A place to save megadetector results to
-	- `Photo_Archive` - A place to archive your photos when done
+  - `Photo_Uploads` - A place to upload photos to
+  - `Photo_MegaOutput` - A place to save megadetector results to
+  - `Photo_Archive` - A place to archive your photos when done
 
 Set up Cluster Account - need dedicated GPU
 
 Install/set up `rclone` on Cluster
-	- run `rclone config`
-	- see rclone.org/drive/
-	
+  - run `rclone config`
+  - see rclone.org/drive/
+
 Set up Conda Environment
-	- Install Conda or Miniconda
-	- Access our conda environment: https://github.com/OxyCompBio/Oxy-Megadetector
-	- Create an environment from our environment file conda.yml
-	- `conda env create -f conda.yml`
+  - Install Conda or Miniconda
+  - Access our conda environment: https://github.com/OxyCompBio/Oxy-Megadetector
+  - Create an environment from our environment file conda.yml
+  - `conda env create -f conda.yml`
   - now you can run `conda activate tensorflow` to activate our environment
 
-#########################################
-
-To Run:
+### Running the pipeline
 
 Upload photos to shared google drive folder: "Photo_Uploads"
   - Naming convention: `OXY1_2021_10_01 *site name and check date of photos`
 
 If off campus, log into vpn (Forticlient)
-	- Use Oxy Login/Password
-	- (if you don't have an account, David Dellinger can set up)
+  - Use Oxy Login/Password
+  - (if you don't have an account, David Dellinger can set up)
 
 Log into cluster
-	- username: `compbio`
-	- enter password
+  - username: `compbio`
+  - enter password
 
 cd into Oxy-Megadetector dir
 
@@ -60,8 +58,8 @@ Run `./sync-photos.sh`, a script that:
   - syncs megadetector output up from cluster to google drive/Photo_MegaOutput
 
 Log into gpu
-	- `ssh gpu01`
-	- enter password
+  - `ssh gpu01`
+  - enter password
 
 Run Megadetector
 Run `./run-megadetector.sh`, a script that:
@@ -71,7 +69,7 @@ Run `./run-megadetector.sh`, a script that:
   - runs megadetector on all images in `Photo_Upload` and saves detection JSON and images above the detection threshhold to `Photo_MegaOutput`
 
 Re-sync files between cluster and Google Drive
-	- run `sync-photos.sh`
+  - run `sync-photos.sh`
 	
 Notes:
 

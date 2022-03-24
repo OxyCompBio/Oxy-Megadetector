@@ -93,6 +93,8 @@ def appendCSV(images, csv_file, rows_to_insert):
 					for k, v in img._getexif().items()
 					if k in ExifTags.TAGS
 				}
+    
+				width, height = img.size
 
 				# not sure if every camera has these values in their metadata
 				# DateTime, ImageDescription, Make, Model, ShutterSpeedValue, ApertureValue, ISOSpeedRatings
@@ -114,7 +116,8 @@ def appendCSV(images, csv_file, rows_to_insert):
 				rows_to_insert.append({"photoDir": photoDir, "exifTimestamp": exifTimestamp, "numAnimalDetections": str(numAnimalDetections), "numHumanDetections": str(numHumanDetections),
 								"jsonAnimalDetection": str(jsonAnimalDetection), "jsonOtherDetection": str(jsonOtherDetection), "maxDetectionConf": maxDetectionConf,
 								"maxDetectionConfHuman": maxDetectionConfHuman, "exifImageDescription": exifImageDescription, "exifMake": exifMake,
-								"exifModel": exifModel, "exifShutterSpeedValue": exifShutterSpeedValue, "exifApertureValue": exifApertureValue, "exifISOSpeedRatings": exifISOSpeedRatings})
+								"exifModel": exifModel, "exifShutterSpeedValue": exifShutterSpeedValue, "exifApertureValue": exifApertureValue, "exifISOSpeedRatings": exifISOSpeedRatings,
+        						"width": width, "height": height})
 		except KeyError:
 			print(KeyError)
 			continue

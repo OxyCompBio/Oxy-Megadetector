@@ -45,9 +45,10 @@ def updateBQ(detector_output_dir, csv_filename):
 					with open (detector_output) as f:
 						images = json.load(f)
 
-					appendCSV(images, c, rows_to_insert)
-
-	errors = client.insert_rows_json("photos.PACAGDRIVE", rows_to_insert)
+					rows_to_insert = appendCSV(images, c, rows_to_insert)
+					print(rows_to_insert)
+	print("rows: " , rows_to_insert)
+	errors = client.insert_rows_json("photos.test", rows_to_insert)
 	if errors == []:
 		print("New rows have been added to BigQuery for MegaDetector file: {}".format(i))
 	else:
@@ -57,8 +58,8 @@ def updateBQ(detector_output_dir, csv_filename):
 def appendCSV(images, csv_file, rows_to_insert):
 #   md_output_csv = md_output.split(".")[0] + ".csv"
 	for entry in images['images']:
-		counter += 1
-		# print(counter)
+#		counter += 1
+		# print("inside: ", entry['file'])
 		photoDir = os.path.join(BASE_PATH, entry['file'])
 		# print(photoDir)
 
@@ -73,21 +74,22 @@ def appendCSV(images, csv_file, rows_to_insert):
 				if detection['category'] == '1':
 					is_animal = True
 					numAnimalDetections += 1
-					jsonAnimalDetection += str(detection)
+					jsonAnimalDetection += json.dumps(detection)
 					if detection["conf"] > maxDetectionConf:
 						maxDetectionConf = detection["conf"]
 
 				elif detection['category'] == '2' and detection["conf"] > 0.8:
 					is_human = True
-					jsonOtherDetection += str(detection)
+					jsonOtherDetection += json.dumps(detection)
 					numHumanDetections += 1
 					if detection["conf"] > maxDetectionConfHuman:
 						maxDetectionConfHuman = detection["conf"]
 				elif detection['category'] == '3' and detection["conf"] > 0.8:
 					is_car = True
-					jsonOtherDetection += str(detection)
+					jsonOtherDetection += json.dumps(detection)
 
-				img = Image.open(os.path.join(BASE_PATH, entry['file']))
+				try: img = Image.open(os.path.join(BASE_PATH, entry['file']))
+				except: continue
 				exif = {
 					ExifTags.TAGS[k]: v
 					for k, v in img._getexif().items()
@@ -100,27 +102,28 @@ def appendCSV(images, csv_file, rows_to_insert):
 				# DateTime, ImageDescription, Make, Model, ShutterSpeedValue, ApertureValue, ISOSpeedRatings
 				try: exifTimestamp = exif["DateTime"]
 				except: exifTimestamp = None
-				try: exifImageDescription = exif["ImageDescription"]
+				try: exifImageDescription = str(exif["ImageDescription"])
 				except: exifImageDescription = None
 				try: exifMake = exif["Make"]
 				except: exifMake = None
 				try: exifModel = exif["Model"]
 				except: exifModel = None
-				try: exifShutterSpeedValue = exif["ShutterSpeedValue"]
+				try: exifShutterSpeedValue = float(exif["ShutterSpeedValue"])
 				except: exifShutterSpeedValue = None
-				try: exifApertureValue = exif["ApertureValue"]
+				try: exifApertureValue = float(exif["ApertureValue"])
 				except: exifApertureValue = None
-				try: exifISOSpeedRatings = exif["ISOSpeedRatings"]
+				try: exifISOSpeedRatings = float(exif["ISOSpeedRatings"])
 				except: exifISOSpeedRatings = None
 
-				rows_to_insert.append({"photoDir": photoDir, "exifTimestamp": exifTimestamp, "numAnimalDetections": str(numAnimalDetections), "numHumanDetections": str(numHumanDetections),
-								"jsonAnimalDetection": str(jsonAnimalDetection), "jsonOtherDetection": str(jsonOtherDetection), "maxDetectionConf": maxDetectionConf,
+				rows_to_insert.append({"photoDir": photoDir, "exifTimestamp": exifTimestamp, "numAnimalDetections": numAnimalDetections, "numHumanDetections": numHumanDetections,
+								"jsonAnimalDetection": jsonAnimalDetection, "jsonOtherDetection": jsonOtherDetection, "maxDetectionConf": maxDetectionConf,
 								"maxDetectionConfHuman": maxDetectionConfHuman, "exifImageDescription": exifImageDescription, "exifMake": exifMake,
 								"exifModel": exifModel, "exifShutterSpeedValue": exifShutterSpeedValue, "exifApertureValue": exifApertureValue, "exifISOSpeedRatings": exifISOSpeedRatings,
         						"width": width, "height": height})
 		except KeyError:
 			print(KeyError)
 			continue
+	return rows_to_insert
 
 
 if __name__ == "__main__":

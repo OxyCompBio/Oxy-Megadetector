@@ -46,22 +46,23 @@ def updateBQ(detector_output_dir, csv_filename):
 					with open (detector_output) as f:
 						images = json.load(f)
 
-					rows_to_insert = appendCSV(images, c, rows_to_insert)
+					rows_to_insert = appendCSV(images, c, i, rows_to_insert)
 					# print(rows_to_insert)
 	print("rows: " , rows_to_insert[0])
-	errors = client.insert_rows_json("afc-uwin.photos.test", rows_to_insert)
+	errors = client.insert_rows_json("afc-uwin.photos.uwin", rows_to_insert)
 	if errors == []:
 		print("New rows have been added to BigQuery for MegaDetector file: {}".format(i))
 	else:
 		print("Encountered errors while inserting rows: {}".format(errors))
 
 
-def appendCSV(images, csv_file, rows_to_insert):
+def appendCSV(images, csv_file, json_file, rows_to_insert):
 #   md_output_csv = md_output.split(".")[0] + ".csv"
+	folder_name = json_file.split(".")[0]
 	for entry in images['images']:
 #		counter += 1
 		# print("inside: ", entry['file'])
-		photoDir = os.path.join(BASE_PATH, entry['file'])
+		photoDir = os.path.join(BASE_PATH, folder_name, entry['file'])
 		# print(photoDir)
 
 		numAnimalDetections = 0

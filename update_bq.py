@@ -14,6 +14,7 @@ import argparse
 # import exif
 import csv
 from PIL import Image, ExifTags
+from datetime import datetime as dt
 
 parser = argparse.ArgumentParser(description = 'Update BigQuery with new MegaDetector output')
 parser.add_argument('upload_folder_dir', type=str,
@@ -46,9 +47,9 @@ def updateBQ(detector_output_dir, csv_filename):
 						images = json.load(f)
 
 					rows_to_insert = appendCSV(images, c, rows_to_insert)
-					print(rows_to_insert)
-	print("rows: " , rows_to_insert)
-	errors = client.insert_rows_json("photos.test", rows_to_insert)
+					# print(rows_to_insert)
+	print("rows: " , rows_to_insert[0])
+	errors = client.insert_rows_json("afc-uwin.photos.test", rows_to_insert)
 	if errors == []:
 		print("New rows have been added to BigQuery for MegaDetector file: {}".format(i))
 	else:
@@ -100,7 +101,7 @@ def appendCSV(images, csv_file, rows_to_insert):
 
 				# not sure if every camera has these values in their metadata
 				# DateTime, ImageDescription, Make, Model, ShutterSpeedValue, ApertureValue, ISOSpeedRatings
-				try: exifTimestamp = exif["DateTime"]
+				try: exifTimestamp = dt.strptime(exif["DateTime"], '%Y:%m:%d %k:%M:%S'); exifTimestamp = dt.strftime(exifTimestamp, '%Y-%m-%dT%k:%M:%S')
 				except: exifTimestamp = None
 				try: exifImageDescription = str(exif["ImageDescription"])
 				except: exifImageDescription = None
@@ -119,7 +120,7 @@ def appendCSV(images, csv_file, rows_to_insert):
 								"jsonAnimalDetection": jsonAnimalDetection, "jsonOtherDetection": jsonOtherDetection, "maxDetectionConf": maxDetectionConf,
 								"maxDetectionConfHuman": maxDetectionConfHuman, "exifImageDescription": exifImageDescription, "exifMake": exifMake,
 								"exifModel": exifModel, "exifShutterSpeedValue": exifShutterSpeedValue, "exifApertureValue": exifApertureValue, "exifISOSpeedRatings": exifISOSpeedRatings,
-        						"width": width, "height": height})
+        						"imgWidth": width, "imgHeight": height})
 		except KeyError:
 			print(KeyError)
 			continue

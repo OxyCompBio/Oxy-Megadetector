@@ -5,6 +5,12 @@ This file takes 4 arguments: path to photo upload directory, path to MegaDetecto
 path to BigQuery's key, and file name for CSV output file.
 """
 
+
+# json dir: compbio/GDrive/Photo_MegaOutputArchives/2018_2020/
+# photo dir: copmbio/GDrive/Photo_Archive/2018_2020/
+# i: 2018 October.json
+# json img file: RHR1/IMG_0517.JPG
+# photo: photo_dir + i + json_img_file
 import os
 from google.cloud import bigquery
 from datetime import datetime, timedelta
@@ -75,22 +81,6 @@ def update_bq(detector_output_dir):
 
 
 def get_image_data(entry, photoDir, rows_to_insert):
-#   md_output_csv = md_output.split(".")[0] + ".csv"
-#         folder_name = json_file.split(".")[0]
-#         for entry in images['images']:
-# #               counter += 1
-#                 # print("inside: ", entry['file'])
-#                 photoDir = os.path.join(BASE_PATH, folder_name, entry['file'])
-#                 # print(photoDir)
-
-#                 numAnimalDetections = 0
-#                 numHumanDetections = 0
-#                 maxDetectionConfHuman = 0
-#                 jsonAnimalDetection = "" # if above 0.8
-#                 maxDetectionConf = 0 # only animal detection confidence
-#                 jsonOtherDetection = ""
-#                 if ('detections' not in entry):
-#                         print(photoDir, 0)
 		numAnimalDetections = 0
 		numHumanDetections = 0
 		maxDetectionConfHuman = 0
@@ -117,37 +107,37 @@ def get_image_data(entry, photoDir, rows_to_insert):
 								is_car = True
 								jsonOtherDetection += json.dumps(detection)
 
-						try: img = Image.open(photoDir)
-						except: continue
-						exif = {
-								ExifTags.TAGS[k]: v
-								for k, v in img._getexif().items()
-								if k in ExifTags.TAGS
-						}
+				try: img = Image.open(photoDir)
+				except: return rows_to_insert
+				exif = {
+						ExifTags.TAGS[k]: v
+						for k, v in img._getexif().items()
+						if k in ExifTags.TAGS
+				}
 
-						width, height = img.size
+				width, height = img.size
 
-						# not sure if every camera has these values in their metadata
-						# DateTime, ImageDescription, Make, Model, ShutterSpeedValue, ApertureValue, ISOSpeedRatings
-						try: exifTimestamp = dt.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S'); exifTimestamp = dt.strftime(exifTimestamp, '%Y-%m-%dT%H:%M:%S')
-						except: exifTimestamp = None
-						try: exifImageDescription = str(exif["ImageDescription"])
-						except: exifImageDescription = None
-						try: exifMake = exif["Make"]
-						except: exifMake = None
-						try: exifModel = exif["Model"]
-						except: exifModel = None
-						try: exifShutterSpeedValue = float(exif["ShutterSpeedValue"])
-						except: exifShutterSpeedValue = None
-						try: exifApertureValue = float(exif["ApertureValue"])
-						except: exifApertureValue = None
-						try: exifISOSpeedRatings = float(exif["ISOSpeedRatings"])
-						except: exifISOSpeedRatings = None
-						rows_to_insert.append({"photoDir": photoDir, "exifTimestamp": exifTimestamp, "numAnimalDetections": numAnimalDetections, "numHumanDetections": numHumanDetections,
-														"jsonAnimalDetection": jsonAnimalDetection, "jsonOtherDetection": jsonOtherDetection, "maxDetectionConf": maxDetectionConf,
-														"maxDetectionConfHuman": maxDetectionConfHuman, "exifImageDescription": exifImageDescription, "exifMake": exifMake,
-														"exifModel": exifModel, "exifShutterSpeedValue": exifShutterSpeedValue, "exifApertureValue": exifApertureValue, "exifISOSpeedRatings": exifISOSpeedRatings,
-												"imgWidth": width, "imgHeight": height})
+				# not sure if every camera has these values in their metadata
+				# DateTime, ImageDescription, Make, Model, ShutterSpeedValue, ApertureValue, ISOSpeedRatings
+				try: exifTimestamp = dt.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S'); exifTimestamp = dt.strftime(exifTimestamp, '%Y-%m-%dT%H:%M:%S')
+				except: exifTimestamp = None
+				try: exifImageDescription = str(exif["ImageDescription"])
+				except: exifImageDescription = None
+				try: exifMake = exif["Make"]
+				except: exifMake = None
+				try: exifModel = exif["Model"]
+				except: exifModel = None
+				try: exifShutterSpeedValue = float(exif["ShutterSpeedValue"])
+				except: exifShutterSpeedValue = None
+				try: exifApertureValue = float(exif["ApertureValue"])
+				except: exifApertureValue = None
+				try: exifISOSpeedRatings = float(exif["ISOSpeedRatings"])
+				except: exifISOSpeedRatings = None
+				rows_to_insert.append({"photoDir": photoDir, "exifTimestamp": exifTimestamp, "numAnimalDetections": numAnimalDetections, "numHumanDetections": numHumanDetections,
+												"jsonAnimalDetection": jsonAnimalDetection, "jsonOtherDetection": jsonOtherDetection, "maxDetectionConf": maxDetectionConf,
+												"maxDetectionConfHuman": maxDetectionConfHuman, "exifImageDescription": exifImageDescription, "exifMake": exifMake,
+												"exifModel": exifModel, "exifShutterSpeedValue": exifShutterSpeedValue, "exifApertureValue": exifApertureValue, "exifISOSpeedRatings": exifISOSpeedRatings,
+										"imgWidth": width, "imgHeight": height})
 		except KeyError as e:
 				print(e.args)
 

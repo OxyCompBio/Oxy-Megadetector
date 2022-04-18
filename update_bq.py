@@ -6,11 +6,6 @@ path to BigQuery's key, and file name for CSV output file.
 """
 
 
-# json dir: compbio/GDrive/Photo_MegaOutputArchives/2018_2020/
-# photo dir: copmbio/GDrive/Photo_Archive/2018_2020/
-# i: 2018 October.json
-# json img file: RHR1/IMG_0517.JPG
-# photo: photo_dir + i + json_img_file
 import os
 from google.cloud import bigquery
 from datetime import datetime, timedelta
@@ -28,6 +23,8 @@ parser.add_argument('md_output_dir', type=str,
                                         help='Path to MegaDetector json output directory')
 parser.add_argument('bigquery_key', type=str,
                                         help='Path to BigQuery json key file')
+parser.add_argument('table_name', type=str,
+                                        help='Path to BigQuery table: e.g "project-name.dataset-name.table-name"')
 # parser.add_argument('csv_filename', type=str,
 #                                         help='Filename for CSV output file')
 args = parser.parse_args()
@@ -46,36 +43,39 @@ def update_bq(detector_output_dir):
 						continue
 
 				for i in filenames:
-						if i not in folderList:
-							folderList.append(i)
 						detector_output_file = os.path.join(detector_output_dir, i)
 						folder_name = i.split(".")[0]
 						# if datetime.now() - datetime.fromtimestamp(os.stat(detector_output).st_ctime) < timedelta(0, 0, 0, 0, 0, 1):
-						if True:
+						if i.endswith(".json"):
 								with open (detector_output_file) as f:
 										images = json.load(f)
 
 								for entry in images['images']:
+									if i not in folderList:
+										folderList.append(i)
+
 									photoDir = os.path.join(BASE_PATH, folder_name, entry['file'])
 									if ('detections' not in entry):
 										print(photoDir, 0)
 									rows_to_insert = get_image_data(entry, photoDir, rows_to_insert)
 
 									if len(rows_to_insert) > 10000:
-										errors = client.insert_rows_json("afc-uwin.photos.uwin", rows_to_insert)
+										errors = client.insert_rows_json(args.table_name, rows_to_insert)
 										if errors == []:
 												folders = '[' + ', '.join(folderList) + ']'
-												print("New rows have been added to BigQuery from MegaDetector files: {}".format(folders))
+												print("New {number} rows have been added to BigQuery from MegaDetector files: {folders}".format(number=len(rows_to_insert),  folders=folders))
 										else:
 												print("Encountered errors while inserting rows: {}".format(errors))
 										rows_to_insert = []
 										folderList = []
+						else:
+							print("Skipping file {}".format(i))
 								# print(rows_to_insert)
 		# print("rows: " , rows_to_insert[0])
-		errors = client.insert_rows_json("afc-uwin.photos.uwin", rows_to_insert)
+		errors = client.insert_rows_json(args.table_name, rows_to_insert)
 		if errors == []:
 				folders = '[' + ','.join(folderList) + ']'
-				print("New rows have been added to BigQuery from MegaDetector files: {}".format(folders))
+				print("New {number} rows have been added to BigQuery from MegaDetector files: {folders}".format(number=len(rows_to_insert),  folders=folders))
 		else:
 				print("Encountered errors while inserting rows: {}".format(errors))
 
@@ -118,7 +118,7 @@ def get_image_data(entry, photoDir, rows_to_insert):
 				width, height = img.size
 
 				# not sure if every camera has these values in their metadata
-				# DateTime, ImageDescription, Make, Model, ShutterSpeedValue, ApertureValue, ISOSpeedRatings
+				# Timestamp, ImageDescription, Make, Model, ShutterSpeedValue, ApertureValue, ISOSpeedRatings
 				try: exifTimestamp = dt.strptime(exif["DateTime"], '%Y:%m:%d %H:%M:%S'); exifTimestamp = dt.strftime(exifTimestamp, '%Y-%m-%dT%H:%M:%S')
 				except: exifTimestamp = None
 				try: exifImageDescription = str(exif["ImageDescription"])

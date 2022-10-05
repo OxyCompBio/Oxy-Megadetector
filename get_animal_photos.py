@@ -22,9 +22,8 @@ args = parser.parse_args()
 
 BASE_PATH = args.base_path
 
-
 def copy_files(detector_output_dir, images_output):
-  for dirpath, filenames in os.walk(detector_output_dir):
+  for dirpath, dirnames, filenames in os.walk(detector_output_dir):
     if dirpath is not detector_output_dir:
       continue
 

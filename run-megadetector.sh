@@ -1,7 +1,8 @@
 # must be run on a GPU environment (ssh01)
-cd ~/Oxy-Megadetector
+# must also run: 
+#   conda activate tensorflow
 
-conda activate tensorflow
+cd ~/Oxy-Megadetector
 
 echo "1. Running MegaDetector..."
 # generates a JSON file (raw megadetector output file) and places it in MegaOutput

@@ -82,7 +82,7 @@ def copy_files(detector_output_dir, images_output):
         destination = os.path.join(images_output, 'negatives', image_file)
         destDir = os.path.join(images_output, 'negatives')
         if not os.path.isdir(destDir):
-          os.makedirs()
+          os.makedirs(destDir)
         try:
           shutil.copy(source, destination)
         except FileNotFoundError:

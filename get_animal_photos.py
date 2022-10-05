@@ -35,6 +35,7 @@ def copy_files(detector_output_dir, images_output):
       print(f'Processing folder: {detector_output}')
 
       files = []
+      negatives = []
       num_files = 0
 
       with open(detector_output) as f:
@@ -56,6 +57,8 @@ def copy_files(detector_output_dir, images_output):
             if detection['category'] == '1' and entry['max_detection_conf'] > 0.8:
               files.append(imgPath)
               break
+            else
+              negatives.append(imgPath)
 
       num_matches = len(files)
       print(
@@ -73,7 +76,17 @@ def copy_files(detector_output_dir, images_output):
           shutil.copy(source, destination)
         except FileNotFoundError:
           print("Skipping missing file")
-
+          
+      for image_file in negatives:
+        source = os.path.join(BASE_PATH, image_file)
+        destination = os.path.join(images_output, 'negatives', image_file)
+        destDir = os.path.join(images_output, 'negatives')
+        if not os.path.isdir(destDir):
+          os.makedirs()
+        try:
+          shutil.copy(source, destination)
+        except FileNotFoundError:
+          print("Skipping missing file")
 
 if __name__ == "__main__":
   copy_files(args.file_location, args.output_dest)

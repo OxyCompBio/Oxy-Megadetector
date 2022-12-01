@@ -1,64 +1,63 @@
 import os
 import csv
 import argparse
-from datetime import datetime
+#from datetime import datetime
 from PIL import Image, ExifTags
 
-#what arguments do we need?
-#just folder path, since we will turn each individual photo into a row in the csv
-#after you get the csv, upload it to the AFC-UWIN folder in gdrive - leave this until after testing
-
-parser = argparse.ArgumentParser(description = 'photo_uploads folder to csv.\
+parser = argparse.ArgumentParser(description='photo_uploads folder to csv.\
                                                 Returns a csv .')
-parser.add_argument('folder_name', type=str,
-                    help='Name of photo folder')
+parser.add_argument('folder_path', type=str,
+                    help='Path of photo folder to be processed')
+parser.add_argument('dest_path', type=str,
+                    help='Path of the destination folder for the csv')
 args = parser.parse_args()
 
-def createCSV(folder_name): 
 
-    folder_path = os.getcwd() + "/" + folder_name #could I just replace this with folder_name in every case and have it still work
-                                                  #bc the .py file is assumed to be in the same working directory as the folder?
-                                                  #we still need the folder path anyway bc it's a column in the csv so I spose keep it
-                                                  #change blah
+def createCSV(folder_path, dest_path):
 
-    with open(os.getcwd()+"/"+folder_name+".csv", "w+") as c: #same deal here: is the os.getcwd necessary?
-        writer = csv.writer(c, escapechar='\\')
-        locAbbr = folder_name.split("_")[0]
-        check_date = "_".join(folder_name.split("_")[1:4])
+  dir_name = folder_path.split("/")[-1]
 
-        firstline = True
-        for photo_name in os.listdir(folder_path): #!!
-                                   
-            img = Image.open(folder_path + "/" + photo_name) #!!
-            exif = {
-                ExifTags.TAGS[k]: v
-                    for k, v in img._getexif().items()
-                    if k in ExifTags.TAGS
-            }    
-            
-            if firstline:
-                writer.writerow(["folder_path", "locAbbr", "check_date", "photo_name"] + list(exif.keys()))
-                firstline = False
-            
-            rowlist = [folder_path, locAbbr, check_date, photo_name]
+  with open(dest_path+"/"+dir_name+".csv", "w+", encoding="utf8") as c:
+    writer = csv.writer(c, escapechar='\\')
 
-            #legitimately not sure what to do about the dates vis a vis UTC
-            for k in exif.keys():
-                if k == "MakerNote":
-                    continue
-                #elif k.contains("DateTime"):
-                    #something with isoformat
-                #else:
-                #print(k, exif[k])
-                rowlist.append(exif[k])
+    firstline = True
+    for root, dirs, files in os.walk(folder_path):
 
-            #print and check for special charachters (commas, double-quotes)
-            #print(rowlist)
+      folder_name = root.split("/")[-1]
+      locAbbr = folder_name.split("_")[0]
+      check_date = "_".join(folder_name.split("_")[1:4])
 
-            writer.writerow(rowlist)
-            print("Finished "+photo_name)
-            continue
-    c.close()
-    
+      for photo_name in files:
+
+        if photo_name.split(".")[-1] == "JPG":
+
+          img = Image.open(root + "/" + photo_name)
+          exif = {
+              ExifTags.TAGS[k]: v
+              for k, v in img._getexif().items()
+              if k in ExifTags.TAGS
+          }
+
+          if firstline:
+            writer.writerow(
+                ["folder_path", "locAbbr", "check_date", "photo_name"] + list(exif.keys()))
+            firstline = False
+
+          rowlist = [root, locAbbr, check_date, photo_name]
+
+          for k in exif.keys():
+            if k == "MakerNote":
+              continue
+            rowlist.append(exif[k])
+
+          writer.writerow(rowlist)
+          #print("Finished "+photo_name)
+          continue
+
+      print("Finished "+root)
+
+  c.close()
+
+
 if __name__ == "__main__":
-  createCSV(args.folder_name)
+  createCSV(args.folder_path, args.dest_path)

@@ -2,7 +2,9 @@ import os
 import csv
 import argparse
 #from datetime import datetime
-from PIL import Image, ExifTags
+from PIL import Image, UnidentifiedImageError
+from PIL.ExifTags import TAGS
+
 
 parser = argparse.ArgumentParser(description='photo_uploads folder to csv.\
                                                 Returns a csv .')
@@ -17,10 +19,18 @@ def createCSV(folder_path, dest_path):
 
   dir_name = folder_path.split("/")[-1]
 
+  # create a csv file and a writer object
   with open(dest_path+"/"+dir_name+".csv", "w+", encoding="utf8") as c:
     writer = csv.writer(c, escapechar='\\')
 
-    firstline = True
+    # create the header row
+    firstrow = ["folder_path", "locAbbr", "check_date", "photo_name"]
+    for k in TAGS:
+      firstrow.append(TAGS[k])
+
+    writer.writerow(firstrow)
+
+    # iterate through directory, including subdirectories
     for root, dirs, files in os.walk(folder_path):
 
       folder_name = root.split("/")[-1]
@@ -29,29 +39,33 @@ def createCSV(folder_path, dest_path):
 
       for photo_name in files:
 
+        # input validation
         if photo_name.split(".")[-1] == "JPG":
 
-          img = Image.open(root + "/" + photo_name)
-          exif = {
-              ExifTags.TAGS[k]: v
-              for k, v in img._getexif().items()
-              if k in ExifTags.TAGS
-          }
+          try:
+            img = Image.open(root + "/" + photo_name)
+          except UnidentifiedImageError:
+            writer.writerow([root, locAbbr, check_date,
+                            photo_name] + ["Corrupted"]*(len(firstrow)-4))
+            continue
 
-          if firstline:
-            writer.writerow(
-                ["folder_path", "locAbbr", "check_date", "photo_name"] + list(exif.keys()))
-            firstline = False
+          # rip exif data from image and create list to become row
+          exif = img._getexif()
 
           rowlist = [root, locAbbr, check_date, photo_name]
 
-          for k in exif.keys():
-            if k == "MakerNote":
+          # assign each item in exif dict to appropriate row
+          for k in TAGS:
+            if TAGS[k] == "MakerNote":
+              rowlist.append("Omitted")
               continue
-            rowlist.append(exif[k])
+            if k in exif.keys():
+              rowlist.append(exif[k])
+            else:
+              rowlist.append("N/A")
 
+          # write the row and repeat ad nauseum
           writer.writerow(rowlist)
-          #print("Finished "+photo_name)
           continue
 
       print("Finished "+root)

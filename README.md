@@ -2,7 +2,7 @@
 
 Tech we use:
 
-- Python
+- Python (I like Python!)
 - TensorFlow
 - Google Colab Notebooks
 - Bash

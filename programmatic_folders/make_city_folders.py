@@ -12,14 +12,9 @@ import pandas as pd
 import re
 import os
 
-# FIXME use os.path.dirname(__file__)
-
-pm = pd.read_csv('photo_detection_metadata.csv')
+pm = pd.read_csv(os.path.dirname(__file__) + '/photo_detection_metadata.csv')
 
 city_names = pm['areaName']
-
-print(city_names)
-print(type(list(city_names)))
 
 # convert pandas city_names series into a unique list
 print(list(set(list(city_names))))
@@ -29,7 +24,7 @@ city_names = list(set(list(city_names)))
 # filter out "Lure Study"
 city_names.remove("Lure Study")
 
-print(city_names)
+# print(city_names)
 
 processed_cities = []
 
@@ -39,8 +34,8 @@ for c in city_names:
 	re_city = re.sub(r'\W+', '', c)
 	processed_cities.append(re_city)
 
-print("Cities:")
-print(processed_cities)
+# print("Cities:")
+# print(processed_cities)
 
 with open('processed_cities.txt', 'w') as f:
     for c in processed_cities:

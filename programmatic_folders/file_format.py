@@ -13,64 +13,79 @@ import os
 
 import logging
 
+import shutil
+
 def main(input_folder, output_folder, photo_csv):
 
-	pm = pd.read_csv(photo_csv)
+    pm = pd.read_csv(photo_csv)
 
-	area_names = pm['areaName']
-	loc_abbrs = pm['locationAbbr']
+    area_names = pm['areaName']
+    loc_abbrs = pm['locationAbbr']
 
-	visit_dates = pm['visitDatetime']
-	visit_dates = list(set(list(visit_dates)))
+    visit_dates = pm['visitDatetime']
+    visit_dates = list(visit_dates)
 
-	photo_names = pm['photoName']
-	photo_names = list(set(list(photo_names)))
-
-
-	area_names = list(set(list(area_names)))
-	loc_abbrs = list(set(list(loc_abbrs)))
-
-	area_names_col = list(pm['areaName'])
-	area_names_col = list(map(lambda x: x.replace(', ', ''), area_names_col))
-
-	# list of loc_abbrs_col -> reference by index
-
-	loc_abbrs_col = list(pm['locationAbbr'])
-	loc_abbrs_col = list(map(lambda x: x.split('-')[-1], loc_abbrs_col))
-
-	# AustinTexas
-	# EML
-	area_names = list(map(lambda x: x.replace(', ', ''), area_names))
-	loc_abbrs = list(map(lambda x: x.split('-')[-1], loc_abbrs))
-
-	city_vid_dict = {}
-
-	for a in area_names:
-		city_vid_dict[a] = {}
+    photo_names = pm['photoName']
+    photo_names = list(set(list(photo_names)))
 
 
-	for i, v in enumerate(visit_dates):
-		
-		date = v.split(' ')[0].replace('-', '_')
+    area_names = list(set(list(area_names)))
+    loc_abbrs = list(set(list(loc_abbrs)))
 
-		city = area_names_col[i]
-		
-		site = loc_abbrs_col[i] 
+    area_names_col = list(pm['areaName'])
+    area_names_col = list(map(lambda x: x.replace(', ', ''), area_names_col))
 
-		city_vid_dict[city][site + '_' + date] = True  
+    # list of loc_abbrs_col -> reference by index
 
-	# k = city
-	# v = date
-	# p = VID names
+    loc_abbrs_col = list(pm['locationAbbr'])
+    loc_abbrs_col = list(map(lambda x: x.split('-')[-1], loc_abbrs_col))
 
-	for k in city_vid_dict:
-		for v in city_vid_dict[k].keys():
-			
-			img_path = str(k) + '/' + str(v)
-			full_img_path = output_folder + '/' + img_path 
+    # AustinTexas:
+    # EML
+    area_names = list(map(lambda x: x.replace(', ', ''), area_names))
+    loc_abbrs = list(map(lambda x: x.split('-')[-1], loc_abbrs))
 
-	# https://stackoverflow.com/questions/8933237/how-do-i-check-if-directory-exists-in-python
-			if not os.path.exists(full_img_path):
-				os.makedirs(full_img_path)
+    city_vid_dict = {}
 
+    for a in area_names:
+        city_vid_dict[a] = {}
+
+
+    for i, v in enumerate(visit_dates):
+        
+        date = v.split(' ')[0].replace('-', '_')
+
+        city = area_names_col[i]
+        
+        site = loc_abbrs_col[i] 
+
+
+        sd = site + '_' + date
+
+        if sd not in city_vid_dict[city]:
+                city_vid_dict[city][sd] = []
+    
+        city_vid_dict[city][sd].append(photo_names[i])
+        
+
+    # k = city
+    # v = date
+    # p = VID names
+        # c = images
+
+    for k in city_vid_dict:
+        for v in city_vid_dict[k].keys():
+            
+            img_path = str(k) + '/' + str(v)
+            full_folder_path = output_folder + '/' + img_path 
+
+    # https://stackoverflow.com/questions/8933237/how-do-i-check-if-directory-exists-in-python
+            if not os.path.exists(full_folder_path):
+                os.makedirs(full_folder_path)
+
+            for c in city_vid_dict[k][v]:
+                shutil.copy(input_folder + '/' + c, full_folder_path + '/' + c)
+
+
+            
 

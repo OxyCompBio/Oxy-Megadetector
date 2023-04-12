@@ -73,19 +73,36 @@ def main(input_folder, output_folder, photo_csv):
     # p = VID names
         # c = images
 
+    # temporarily modify to return full_folder_paths
+    # this allows us to check folder path names
+    # gracefully exit if folder path names already exist
+
+    fp = []
+    imgs = []
+
     for k in city_vid_dict:
         for v in city_vid_dict[k].keys():
             
             img_path = str(k) + '/' + str(v)
             full_folder_path = output_folder + '/' + img_path 
 
+            fp.append(full_folder_path)
+
     # https://stackoverflow.com/questions/8933237/how-do-i-check-if-directory-exists-in-python
             if not os.path.exists(full_folder_path):
                 os.makedirs(full_folder_path)
+            else:
+                print("directory already exists")
 
             for c in city_vid_dict[k][v]:
+                imgs.append(c)
                 shutil.copy(input_folder + '/' + c, full_folder_path + '/' + c)
 
+        print(k, v)
+
+        # print(p)
+
+    return [fp, imgs]
 
             
 

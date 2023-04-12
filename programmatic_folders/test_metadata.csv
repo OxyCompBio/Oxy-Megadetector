@@ -1,0 +1,6 @@
+"areaName","locationAbbr","utmEast","utmNorth","utmZone","visitDatetime","cameraID","photoName","photoDateTime","filepath","commonName","numIndividuals"
+"Austin, Texas","AUTX-C01-EML",612014.5,3357457.75,"14N",2018-08-18 20:33:00,2920,"IMG_0002.JPG",2018-08-14 16:55:06,"gs://urban-wildlife-autx/AUTX-AUTX-C01-EML-08102018/VID10010-00001.jpg","Fox squirrel",1
+"Austin, Texas","AUTX-C01-EML",612014.5,3357457.75,"14N",2018-08-18 20:33:00,2920,"IMG_0003.JPG",2018-07-20 23:43:34,"gs://urban-wildlife-autx/AUTX-AUTX-C01-EML-08102018/VID10010-00003.jpg","Fox squirrel",1
+"Austin, Texas","AUTX-C01-EML",612014.5,3357457.75,"14N",2018-08-18 20:33:00,2920,"IMG_0004.JPG",2018-07-12 10:36:26,"gs://urban-wildlife-autx/AUTX-AUTX-C01-EML-08102018/VID10010-00004.jpg","Coyote",1
+"Austin, Texas","AUTX-C01-EML",612014.5,3357457.75,"14N",2018-08-18 20:33:00,2920,"IMG_0005.JPG",2018-07-11 02:58:58,"gs://urban-wildlife-autx/AUTX-AUTX-C01-EML-08102018/VID10010-00005.jpg","Coyote",1
+"Austin, Texas","AUTX-C01-EML",612014.5,3357457.75,"14N",2018-11-01 20:33:00,2920,"IMG_0006.JPG",2018-07-10 20:07:46,"gs://urban-wildlife-autx/AUTX-AUTX-C01-EML-08102018/VID10010-00007.jpg","Human",1

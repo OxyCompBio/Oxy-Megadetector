@@ -15,6 +15,17 @@ import logging
 
 import shutil
 
+def remove_duplicates(input_list):
+
+    no_duplicates = []
+
+    for i in input_list:
+        if i not in no_duplicates:
+            no_duplicates.append(i)
+
+    return no_duplicates
+
+
 def main(input_folder, output_folder, photo_csv):
 
     pm = pd.read_csv(photo_csv)
@@ -26,11 +37,17 @@ def main(input_folder, output_folder, photo_csv):
     visit_dates = list(visit_dates)
 
     photo_names = pm['photoName']
-    photo_names = list(set(list(photo_names)))
+    #photo_names = list(set(list(photo_names)))
 
+    photo_names = list(photo_names)
+    photo_names = remove_duplicates(photo_names)
 
-    area_names = list(set(list(area_names)))
-    loc_abbrs = list(set(list(loc_abbrs)))
+    area_names = list(area_names)
+    # area_names = remove_duplicates(area_names)
+    
+
+    loc_abbrs = list(loc_abbrs)
+    # loc_abbrs = remove_duplicates(loc_abbrs)
 
     area_names_col = list(pm['areaName'])
     area_names_col = list(map(lambda x: x.replace(', ', ''), area_names_col))
@@ -44,6 +61,12 @@ def main(input_folder, output_folder, photo_csv):
     # EML
     area_names = list(map(lambda x: x.replace(', ', ''), area_names))
     loc_abbrs = list(map(lambda x: x.split('-')[-1], loc_abbrs))
+
+    area_names = list(area_names)
+    area_names = remove_duplicates(area_names)
+
+    loc_abbrs = list(loc_abbrs)
+    loc_abbrs = remove_duplicates(loc_abbrs)
 
     city_vid_dict = {}
 

@@ -44,7 +44,22 @@ def test_jpg_exists():
         # make the test more general - test for non-emptiness
 
         # assert os.path.isfile(output_folder + '/AustinTexas/EML_2018_11_01/IMG_0002.JPG')
-        assert len(os.listdir(output_folder + '/AustinTexas/EML_2018_11_01')) > 0
+
+        # 5 asserts to make sure that JPG distribution fits what we expect
+        # these asserts should check that the JPGs are going to the correct folders
+        assert os.path.isfile(output_folder + '/AustinTexas/EML_2018_08_18/IMG_0002.JPG')
+        assert os.path.isfile(output_folder + '/AustinTexas/EML_2018_08_18/IMG_0003.JPG')
+        assert os.path.isfile(output_folder + '/AustinTexas/EML_2018_08_18/IMG_0004.JPG')
+        assert os.path.isfile(output_folder + '/AustinTexas/EML_2018_11_01/IMG_0005.JPG')
+        assert os.path.isfile(output_folder + '/PasadenaCalifornia/EML_2018_11_01/IMG_0006.JPG')        
+
+        # length checks for directory
+        # csv file is structured to have 3 csv files for 08_18 and 1 csv file for 11_01
+        # 4 
+        assert len(os.listdir(output_folder + '/AustinTexas/EML_2018_08_18')) == 3
+        assert len(os.listdir(output_folder + '/AustinTexas/EML_2018_11_01')) == 1
+        assert len(os.listdir(output_folder + '/PasadenaCalifornia/EML_2018_11_01')) == 1
+
         
 # each test function should run file_format once
 
@@ -89,39 +104,10 @@ def test_image_not_found_exception():
         clear_output()
         output_folder = 'test_output'
 
-        filepaths, files = file_format.main('jpg_imgs', output_folder, 'test_metadata.csv')
+        # read from the bad csv to get a non-existent jpg
+        # then check to ensure that the file doesn't exist
 
-    
-        csv = pd.read_csv('test_metadata.csv')
-        csv_fps = csv['filepath']
-
-        print('csv')
-        print(list(csv_fps))
-
-        # check to see if each jpg file is also found in the csv
-        # take the csv filepaths and coerce them into a list format
-        # then check if the jpgs we want are actually in this list
-        # since jpgs we want are IMG_x.jpg, while the filepaths in the csv are 0000x.jpg, cut off the first few characters
-
-        for long_fp in list(csv_fps):
-            # print(long_fp)
-
-            for fi in files:
-                # print(fi)
-                
-                processed_fi = fi[4:].lower()
-                # print(processed_fi)
-
-                if processed_fi in long_fp:
-                    print(fi[4:8], "jpg filepath exists")
-                    
-                else:
-                    print(fi[4:8], "jpg filepath does not exist")
-
-        #for fi in files:
-            #if fi in csv_fps:
-             #   print('filepath exists')
-            #else:
-             #   print('filepath does not exist')
-                    
-
+        try:
+            filepaths, files = file_format.main('jpg_imgs', output_folder, 'test_metadata_bad.csv')
+        except FileNotFoundError:
+            print("file not found exception") 

@@ -89,39 +89,48 @@ def test_image_not_found_exception():
         clear_output()
         output_folder = 'test_output'
 
-        filepaths, files = file_format.main('jpg_imgs', output_folder, 'test_metadata.csv')
+        # read from the bad csv to get a non-existent jpg
+        # then check to ensure that the file doesn't exist
 
-    
+        try:
+            filepaths, files = file_format.main('jpg_imgs', output_folder, 'test_metadata_bad.csv')
+        except FileNotFoundError:
+            print("file not found exception")
+
         csv = pd.read_csv('test_metadata.csv')
         csv_fps = csv['filepath']
 
         print('csv')
         print(list(csv_fps))
 
+        filepaths, files = file_format.main('jpg_imgs', output_folder, 'test_metadata.csv')
+
         # check to see if each jpg file is also found in the csv
         # take the csv filepaths and coerce them into a list format
         # then check if the jpgs we want are actually in this list
         # since jpgs we want are IMG_x.jpg, while the filepaths in the csv are 0000x.jpg, cut off the first few characters
 
+        # also get the directory that the jpg files are in
+        # assert if the jpg files are in the appropriate EML folders
+
         for long_fp in list(csv_fps):
-            # print(long_fp)
 
-            for fi in files:
-                # print(fi)
-                
+            for fi in files:   
                 processed_fi = fi[4:].lower()
-                # print(processed_fi)
 
-                if processed_fi in long_fp:
+                if processed_fi in long_fp: # IMG_x.jpg exists in the csv
                     print(fi[4:8], "jpg filepath exists")
                     
-                else:
-                    print(fi[4:8], "jpg filepath does not exist")
-
-        #for fi in files:
-            #if fi in csv_fps:
-             #   print('filepath exists')
-            #else:
-             #   print('filepath does not exist')
+                    if fi in os.listdir(output_folder + '/AustinTexas/EML_2018_08_18/'): # if the file is in the contents of the directory
+                        assert(os.path.isfile(output_folder + '/AustinTexas/EML_2018_08_18/' + fi)) # assert that it is a proper jpg file
                     
+                    # same assert for the other folder
+                    elif fi in os.listdir(output_folder + '/AustinTexas/EML_2018_11_01/'):
+                        assert(os.path.isfile(output_folder + '/AustinTexas/EML_2018_11_01/' + fi))
 
+                # FIXME issue with assert not
+                #else:
+                 #   print(fi)
+                  #  print(os.listdir(output_folder + '/AustinTexas/EML_2018_11_01/'))
+                   # assert not (os.path.isfile(output_folder + '/AustinTexas/EML_2018_11_01/' + fi))
+                    

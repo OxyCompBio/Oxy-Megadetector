@@ -55,7 +55,7 @@ def test_jpg_exists():
 
         # length checks for directory
         # csv file is structured to have 3 csv files for 08_18 and 1 csv file for 11_01
-        # 4 
+        # 3 files for Austin 08_18, 1 file for Austin 11_01, and 1 file for PACA 
         assert len(os.listdir(output_folder + '/AustinTexas/EML_2018_08_18')) == 3
         assert len(os.listdir(output_folder + '/AustinTexas/EML_2018_11_01')) == 1
         assert len(os.listdir(output_folder + '/PasadenaCalifornia/EML_2018_11_01')) == 1
